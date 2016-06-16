@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript"  src="assets/jquery-2.2.4.min.js"></script>
+    <script type="text/javascript" src="assets/typer.js"></script>
+    <link rel="stylesheet" type="text/css" href="assets/typer.css">
+</head>
+<body>
+
+    <h1 id="typer-title">Typist</h1>
+
+    <!-- Type speed -->
+    <div id="stats">
+        <span id="elapsed-time" class="field">
+            <span id="elapsed-time" class="field-key">Elapsed Time: </span>
+            <span id="elapsed-time-value-number" class="field-value">0</span><span id="average-speed-value-unit"> sec</span>
+        </span>
+        <span id="word-count" class="field">
+            <span id="word-count" class="field-key">Words: </span>
+            <span id="word-count-value-number" class="field-value">0</span>
+        </span>
+        <span id="average-speed" class="field">
+            <span id="average-speed" class="field-key">Average Speed: </span>
+            <span id="average-speed-value-number" class="field-value">0</span><span id="average-speed-value-unit"> WPM</span>
+        </span>
+    </div>
+
+    <div id="options">
+        <span id="endless" class="field">
+            <input type="checkbox" name="endless" id="endless-checkbox"> Endless</input>
+        </span>
+        <span id="backspace" class="field">
+            <input type="checkbox" name="backspace" id="backspace-checkbox" checked> Backspace</input>
+    </div>
+
+    <!-- Typing main container -->
+    <div id="typer-container">
+        <!-- 3 lines of text with cursor on the next character -->
+        <div class="text-container" id="reference-container">
+            <div id="reference-text"></div>
+        </div>
+        <!-- 3 lines of text with correct/incorrect indicator -->
+        <div class="text-container input-idle" id="input-container">
+            <div id="click-prompt">Click this area to begin</div>
+            <div id="input-text"></div>
+        </div>
+    </div>
+
+    <!-- <div id="text-selector">
+        <textarea id="text-input-box"></textarea>
+        <div id="text-select-buttons">
+            <button id="text-input-submit">Load</button>
+            <button id="sample-text">Sample Text</button>
+        </div>
+    </div> -->
+
+</body>
+</html>
