@@ -30,7 +30,7 @@ var restartPrompt = "Click this area to restart";
 
 // Functions
 // Event handlers
-$(document).ready(function() {
+$(window).load(function() {
     console.log("Ready!");
 
     numCharsPerLine = Math.ceil($("#reference-container").width() / 9);
