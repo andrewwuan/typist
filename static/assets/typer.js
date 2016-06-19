@@ -6,7 +6,6 @@ var numTypeLinesToShow = 2;
 // Options
 var allowBackspace = true;
 var endless = false;
-var dataFileName = "data.csv";
 
 // Variables
 var numCharsPerLine;
@@ -35,8 +34,6 @@ var restartPrompt = "Click this area to restart";
 // Event handlers
 $(window).load(function() {
     console.log("Ready!");
-
-    window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
 
     numCharsPerLine = Math.ceil($("#reference-container").width() / 9);
 
@@ -80,90 +77,6 @@ $(window).load(function() {
     typeText = cleanText(sampleText);
     resetTyperContainers();
 });
-
-function fsErrorHandler(e) {
-    var msg = '';
-
-    switch (e.code) {
-        case FileError.QUOTA_EXCEEDED_ERR:
-        msg = 'QUOTA_EXCEEDED_ERR';
-        break;
-        case FileError.NOT_FOUND_ERR:
-        msg = 'NOT_FOUND_ERR';
-        break;
-        case FileError.SECURITY_ERR:
-        msg = 'SECURITY_ERR';
-        break;
-        case FileError.INVALID_MODIFICATION_ERR:
-        msg = 'INVALID_MODIFICATION_ERR';
-        break;
-        case FileError.INVALID_STATE_ERR:
-        msg = 'INVALID_STATE_ERR';
-        break;
-        default:
-        msg = 'Unknown Error';
-        break;
-    };
-
-    console.log('Error: ' + msg);
-}
-
-// Read data from file on disk
-function readFromFile(callback) {
-    window.webkitStorageInfo.requestQuota(PERSISTENT, 1024*1024, function(grantedBytes) {
-        window.requestFileSystem(PERSISTENT, grantedBytes, fsReadHandler, fsErrorHandler);
-    }, function (e) {
-        alert("Can't get permission to store data. Record will not be saved");
-    });
-
-    function fsReadHandler(fs) {
-        fs.root.getFile(dataFileName, {create: true, exclusive: false}, function(fileEntry) {
-
-            // Read from current file
-            fileEntry.file(function(file) {
-                var reader = new FileReader();
-
-                reader.onloadend = function(e) {
-                    callback(fileEntry, this.result);
-                };
-
-                reader.readAsText(file);
-            }, fsErrorHandler);
-        }, fsErrorHandler);
-    }
-}
-
-// Append data to file on disk
-function appendRowToFile(row) {
-    readFromFile(function(fileEntry, csvContent) {
-
-        // Generate new csv text
-        var oldRows = [];
-        if (csvContent != '') {
-            oldRows = Papa.parse(csvContent, { header: true }).data;
-        }
-
-        oldRows.push(row);
-        var text = Papa.unparse(oldRows, {quotes: true});
-
-        // Write
-        writeToFile(fileEntry, text);
-    });
-}
-
-// Write plain text to file on disk
-function writeToFile(fileEntry, text) {
-    fileEntry.createWriter(function(fileWriter) {
-
-        fileWriter.onerror = function(e) {
-            console.log("Can't write to disk.");
-        };
-
-        var blob = new Blob([text], {type: 'text/plain'});
-        fileWriter.write(blob);
-
-    }, fsErrorHandler);
-}
 
 function cleanText(text) {
     return text.replace(/( |\r|\r\n|\n)/g, String.fromCharCode(160))
