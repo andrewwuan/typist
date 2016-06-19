@@ -7,7 +7,6 @@ var numTypeLinesToShow = 2;
 var allowBackspace = true;
 var endless = false;
 var dataFileName = "data.csv";
-var dataFileHeaders = ["duration", "words"]
 
 // Variables
 var numCharsPerLine;
@@ -24,6 +23,8 @@ var curReferenceChar;
 var timerInterval;
 var elapsedSec10 = 0;
 var words = 0;
+var hits = 0;
+var misses = 0;
 
 var startPrompt = "Click this area to resume";
 var pausePrompt = "Type now! Click again to pause";
@@ -172,6 +173,8 @@ function cleanText(text) {
 function resetTyperContainers() {
     currentIndex = 0;
     words = 0;
+    hits = 0;
+    misses = 0;
     typeDone = false;
 
     referenceLines = [];
@@ -334,8 +337,10 @@ function keyPressHandler(event) {
 
     var char = prepareChar(charText, false);
     if (match) {
+        hits++;
         char.addClass("char-correct");
     } else {
+        misses++;
         char.addClass("char-incorrect");
     }
     line.append(char);
@@ -346,8 +351,14 @@ function finish() {
 
     // Build CSV row
     var row = {};
+    row["finish time"] = timeStamp();
     row["duration"] = Math.floor(elapsedSec10 / 10);
     row["words"] = words;
+    row["wpm"] = Math.round(words * 10 * 60 / elapsedSec10);
+    row["hits"] = hits;
+    row["misses"] = misses;
+    row["hit rate"] = ((hits / (hits + misses)) * 100).toFixed(2) + "%";
+
     appendRowToFile(row);
 
     readFromFile(function(fileEntry, text) {console.log(text);});
