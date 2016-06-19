@@ -6,6 +6,7 @@ var numTypeLinesToShow = 2;
 // Options
 var allowBackspace = true;
 var endless = false;
+var dataFileName = "data.csv";
 
 // Variables
 var numCharsPerLine;
@@ -32,6 +33,8 @@ var restartPrompt = "Click this area to restart";
 // Event handlers
 $(window).load(function() {
     console.log("Ready!");
+
+    window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
 
     numCharsPerLine = Math.ceil($("#reference-container").width() / 9);
 
@@ -75,6 +78,78 @@ $(window).load(function() {
     typeText = cleanText(sampleText);
     resetTyperContainers();
 });
+
+function fsErrorHandler(e) {
+    var msg = '';
+
+    switch (e.code) {
+        case FileError.QUOTA_EXCEEDED_ERR:
+        msg = 'QUOTA_EXCEEDED_ERR';
+        break;
+        case FileError.NOT_FOUND_ERR:
+        msg = 'NOT_FOUND_ERR';
+        break;
+        case FileError.SECURITY_ERR:
+        msg = 'SECURITY_ERR';
+        break;
+        case FileError.INVALID_MODIFICATION_ERR:
+        msg = 'INVALID_MODIFICATION_ERR';
+        break;
+        case FileError.INVALID_STATE_ERR:
+        msg = 'INVALID_STATE_ERR';
+        break;
+        default:
+        msg = 'Unknown Error';
+        break;
+    };
+
+    console.log('Error: ' + msg);
+}
+
+// Read data from file on disk
+function readFromFile(callback) {
+    window.webkitStorageInfo.requestQuota(PERSISTENT, 1024*1024, function(grantedBytes) {
+        window.requestFileSystem(PERSISTENT, grantedBytes, fsReadHandler, fsErrorHandler);
+    }, function (e) {
+        alert("Can't get permission to store data. Record will not be saved");
+    });
+
+    function fsReadHandler(fs) {
+        fs.root.getFile(dataFileName, {created: true, exclusive: false}, function(fileEntry) {
+
+            // Read from current file
+            fileEntry.file(function(file) {
+                var reader = new FileReader();
+
+                reader.onloadend = function(e) {
+                    callback(fileEntry, this.result);
+                }
+            }, errorHandler);
+        });
+    }
+}
+
+// Append data to file on disk
+function appendToFile(row) {
+    readFromFile(function(fileEntry, csvContent) {
+        fileEntry.createWriter(function(fileWriter) {
+
+            fileWriter.onerror = function(e) {
+                alert("Can't get permission to store data. Record will not be saved");
+            };
+
+            var csv = Papa.parse(csvContent, { header: true });
+            var oldRows = csv.data;
+            oldRows.push(row);
+
+            // Generate blob with new csv data
+            var blob = new Blob([Papa.unparse(oldRows)], {type: 'text/plain'});
+
+            fileWriter.write(blob);
+
+        }, errorHandler);
+    });
+}
 
 function cleanText(text) {
     return text.replace(/( |\r|\r\n|\n)/g, String.fromCharCode(160))
@@ -139,8 +214,7 @@ function startTyping() {
         timerInterval = setInterval(function () {
             elapsedSec10++;
             if (elapsedSec10 % 10 == 0) {
-                $("#elapsed-time-value-number").text(String(elapsedSec10 / 10));
-                $("#average-speed-value-number").text(String(Math.ceil(words * 60 * 10 / elapsedSec10)));
+                updateStatsView();
             }
         }, 100);
     }
