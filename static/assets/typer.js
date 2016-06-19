@@ -7,6 +7,7 @@ var numTypeLinesToShow = 2;
 var allowBackspace = true;
 var endless = false;
 var dataFileName = "data.csv";
+var dataFileHeaders = ["duration", "words"]
 
 // Variables
 var numCharsPerLine;
@@ -115,7 +116,7 @@ function readFromFile(callback) {
     });
 
     function fsReadHandler(fs) {
-        fs.root.getFile(dataFileName, {created: true, exclusive: false}, function(fileEntry) {
+        fs.root.getFile(dataFileName, {create: true, exclusive: false}, function(fileEntry) {
 
             // Read from current file
             fileEntry.file(function(file) {
@@ -123,32 +124,44 @@ function readFromFile(callback) {
 
                 reader.onloadend = function(e) {
                     callback(fileEntry, this.result);
-                }
-            }, errorHandler);
-        });
+                };
+
+                reader.readAsText(file);
+            }, fsErrorHandler);
+        }, fsErrorHandler);
     }
 }
 
 // Append data to file on disk
-function appendToFile(row) {
+function appendRowToFile(row) {
     readFromFile(function(fileEntry, csvContent) {
-        fileEntry.createWriter(function(fileWriter) {
 
-            fileWriter.onerror = function(e) {
-                alert("Can't get permission to store data. Record will not be saved");
-            };
+        // Generate new csv text
+        var oldRows = [];
+        if (csvContent != '') {
+            oldRows = Papa.parse(csvContent, { header: true }).data;
+        }
 
-            var csv = Papa.parse(csvContent, { header: true });
-            var oldRows = csv.data;
-            oldRows.push(row);
+        oldRows.push(row);
+        var text = Papa.unparse(oldRows, {quotes: true});
 
-            // Generate blob with new csv data
-            var blob = new Blob([Papa.unparse(oldRows)], {type: 'text/plain'});
-
-            fileWriter.write(blob);
-
-        }, errorHandler);
+        // Write
+        writeToFile(fileEntry, text);
     });
+}
+
+// Write plain text to file on disk
+function writeToFile(fileEntry, text) {
+    fileEntry.createWriter(function(fileWriter) {
+
+        fileWriter.onerror = function(e) {
+            console.log("Can't write to disk.");
+        };
+
+        var blob = new Blob([text], {type: 'text/plain'});
+        fileWriter.write(blob);
+
+    }, fsErrorHandler);
 }
 
 function cleanText(text) {
@@ -330,6 +343,14 @@ function keyPressHandler(event) {
 
 function finish() {
     stopTyping();
+
+    // Build CSV row
+    var row = {};
+    row["duration"] = Math.floor(elapsedSec10 / 10);
+    row["words"] = words;
+    appendRowToFile(row);
+
+    readFromFile(function(fileEntry, text) {console.log(text);});
 }
 
 function fillReferenceLineIfNeeded() {
