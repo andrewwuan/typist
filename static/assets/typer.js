@@ -125,7 +125,7 @@ function updateTyperContainersView() {
 }
 
 function updateStatsView() {
-    $("#elapsed-time-value-number").text(String(elapsedSec10 / 10));
+    $("#elapsed-time-value-number").text(Math.floor(String(elapsedSec10 / 10)));
     $("#word-count-value-number").text(String(words));
     $("#average-speed-value-number").text(String(Math.ceil(words * 60 * 10 / elapsedSec10)));
 }
@@ -154,19 +154,25 @@ function getWords() {
     for (var i = 0; i < typeLines.length; i++) {
         var lineCounter = 0;
         var chars = typeLines[i].children();
-        var lastSpace = false;
+        var referenceChars = referenceLines[i].children();
+        var newWord = false;
         var seenError = false;
         for (var j = 0; j < chars.length; j++) {
-            if ($(chars[j]).hasClass("char-incorrect")) {
+            var jqChar = $(chars[j]);
+            var jqReferenceChar = $(referenceChars[j]);
+            if (jqChar.hasClass("char-incorrect")) {
                 seenError = true;
             }
 
-            if ($(chars[j]).text() == String.fromCharCode(160)) {
-                if ((!seenError) && (!lastSpace)) lineCounter++;
-                lastSpace = true;
+            var notSpace = jqReferenceChar.text() != String.fromCharCode(160);
+            if (!newWord && notSpace) {
                 seenError = false;
-            } else {
-                lastSpace = false;
+            }
+            newWord = notSpace;
+
+            if (newWord && !seenError && (j == referenceChars.length - 1 || $(referenceChars[j + 1]).text() == String.fromCharCode(160))) {
+                console.log("Incrementing at j = " + j);
+                lineCounter++;
             }
         }
         counter += lineCounter;
