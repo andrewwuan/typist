@@ -6,10 +6,11 @@ html, body {
     font-weight: bold;
     text-align: center;
     margin: 50px;
+    cursor: pointer; cursor: hand;
 }
 
 #stats {
-    margin: 80px auto 15px auto;
+    margin: 100px auto 15px auto;
     text-align: center;
     font-weight: bold;
 }
@@ -23,12 +24,6 @@ html, body {
 
 .field-value {
     text-decoration: underline;
-}
-
-#options {
-    margin: 30px auto 10px auto;
-    text-align: center;
-    font-weight: bold;
 }
 
 #text-selector {
@@ -62,6 +57,7 @@ html, body {
 }
 
 #input-container {
+    cursor: pointer; cursor: hand;
 }
 
 .text-container {
@@ -104,4 +100,75 @@ html, body {
 
 .input-inactive {
     border: 2px solid #FF5555;
+}
+
+#options {
+    margin: 150px auto 10px auto;
+    text-align: center;
+    font-weight: bold;
+}
+
+#password-container {
+    text-align: center;
+    font-weight: bold;
+    margin: 150px auto auto auto;
+}
+
+#password-prompt {
+    margin-bottom: 50px;
+    font-size: 18px;
+}
+
+#password-input {
+    width: 20%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    text-align: center;
+    font-size: 16px;
+}
+
+#typing-text-field {
+    margin-top: 50px;
+}
+
+#typing-text {
+    width: 50%;
+    height: 200px;
+    padding: 12px 20px 12px 25px;
+    border: 3px solid #cccccc;
+    border-radius: 8px;
+    font-size: 15px;
+    line-height: 150%;
+    margin: 40px auto;
+}
+
+.span-button {
+    border: 2px solid #000000;
+    border-radius: 5px;
+    width: 50px;
+    padding: 10px 20px;
+    cursor: pointer; cursor: hand;
+    margin: 20px;
+}
+
+.footer {
+    position: absolute;
+    right: 30%;
+    bottom: 0;
+    left: 30%;
+    padding: 1rem;
+    text-align: center;
+}
+
+.footer-link {
+    margin: 10px auto 30px auto;
+    color: #666666;
+    font-size: 14px;
+    font-style: italic;
+    cursor: pointer; cursor: hand;
+}
+
+.footer-link:hover {
+    text-decoration: underline;
 }

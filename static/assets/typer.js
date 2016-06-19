@@ -2,6 +2,7 @@
 // Configuration
 var numReferenceLinesToShow = 3;
 var numTypeLinesToShow = 2;
+var password = "123";
 
 // Options
 var allowBackspace = true;
@@ -37,9 +38,54 @@ $(window).load(function() {
 
     numCharsPerLine = Math.ceil($("#reference-container").width() / 9);
 
-    $("#text-input-submit").click(function() {
-        typeText = cleanText($("#text-input-box").val());
+    $("#typer-title,#home-link").click(function() {
+        $("#main-container").show();
+        $("#admin-container").hide();
+        $("#admin-link").show();
+        $("#home-link").hide();
+    });
+
+    $("#admin-link").click(function() {
+        if (elapsedSec10 == 0 || typeDone) {
+            $("#password-input").val('');
+            $("#password-container").show();
+            $("#options").hide();
+
+            $("#main-container").hide();
+            $("#admin-container").show();
+            $("#admin-link").hide();
+            $("#home-link").show();
+
+            $("#password-input").focus();
+        } else {
+            alert("Typing session in progress!")
+        }
+    });
+
+    $("#password-input").keypress(function (e) {
+        if (e.which == 13) {
+            if ($("#password-input").val() == password) {
+                $("#password-container").hide();
+                $("#typing-text").val(typeText);
+                $("#options").show();
+            } else {
+                alert($("#password-input").val() + " is not the correct password!");
+            }
+        }
+    });
+
+    $("#update-typing-text").click(function() {
+        typeText = cleanText($("#typing-text").val());
         resetTyperContainers();
+        alert("Update Successful!");
+    });
+
+    $("#download-data").click(function() {
+        readFromFile(function (fe, content) {
+            console.log(content);
+            var downloadA = $("<a>", {download: "data.csv", href: "data:text/csv,"+encodeURIComponent(content)});
+            downloadA[0].click();
+        });
     });
 
     $("#endless-checkbox").change(function() {
@@ -171,7 +217,6 @@ function getWords() {
             newWord = notSpace;
 
             if (newWord && !seenError && (j == referenceChars.length - 1 || $(referenceChars[j + 1]).text() == String.fromCharCode(160))) {
-                console.log("Incrementing at j = " + j);
                 lineCounter++;
             }
         }
@@ -200,6 +245,11 @@ function stopTyping() {
 }
 
 function keyPressHandler(event) {
+    // Ignore new line
+    if (event.which == 13) {
+        return;
+    }
+
     var line;
     if (typeLines.length == 0) {
         line = prepareLine("", false);
@@ -375,4 +425,4 @@ function getNextLine() {
     }
 }
 
-var sampleText = "Censorship in the People's Republic of China is implemented or mandated by the PRC's ruling party, the Communist Party of China. The government censors content for mainly political reasons, but also to maintain its control over the populace. The Chinese government asserts that it has the legal right to control the internet's content within their territory, and their censorship rules do not infringe on the citizen's right to free speech. Censored media include essentially all capable of reaching a wide audience including television, print media, radio, film, theater, text messaging, instant messaging, video games, literature and the Internet. Chinese officials have access to uncensored information via an internal document system. Reporters Without Borders ranks China's press situation as \"very serious\", the worst ranking on their five-point scale. In August 2012 the OpenNet Initiative classified Internet censorship in China as \"pervasive\" in the political and conflict/security areas and \"substantial\" in the social and Internet tools areas, the two most extensive classifications of the five they use. Freedom House ranks the press there as \"not free\", the worst ranking, saying that \"state control over the news media in China is achieved through a complex combination of party monitoring of news content, legal restrictions on journalists, and financial incentives for self-censorship,\" and an increasing practice of \"cyber-disappearance\" of material written by or about activist bloggers. Other views suggest that local Chinese businesses such as Baidu, Tencent and Alibaba, some of the world's largest internet enterprises, benefited from the way China has blocked international rivals from the market, encouraging domestic competition."
+var sampleText = "The Solar System consists of the Sun Moon and Planets. It also consists of comets, meteoroids and asteroids. The Sun is the largest member of the Solar System. In order of distance from the Sun, the planets are Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune and Pluto; the dwarf planet. The Sun is at the centre of the Solar System and the planets, asteroids, comets and meteoroids revolve around it."
