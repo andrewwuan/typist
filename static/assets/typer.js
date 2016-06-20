@@ -43,6 +43,8 @@ $(window).load(function() {
         $("#admin-container").hide();
         $("#admin-link").show();
         $("#home-link").hide();
+
+        resetTyperContainers();
     });
 
     $("#admin-link").click(function() {
@@ -130,6 +132,7 @@ function cleanText(text) {
 
 // Typing text related
 function resetTyperContainers() {
+    textDepleted = false;
     currentIndex = 0;
     words = 0;
     hits = 0;
@@ -399,14 +402,15 @@ function getNextLine() {
 
     if (endless) {
         while (currentIndex + numCharsPerLine >= typeText.length - 1) {
-            typeText = typeText + ' ' + typeText;
+            typeText = typeText + String.fromCharCode(160) + typeText;
+            console.log("Expanded. typeText = " + typeText);
         }
     }
 
     if (currentIndex + numCharsPerLine >= typeText.length - 1) {
         // If remaining text doesn't fill one line, return everything left
         currentIndex = typeText.length;
-        textDepleted = true
+        textDepleted = true;
         return typeText.substring(index, typeText.length);
     } else {
         var breakIndex = currentIndex + numCharsPerLine - 1;
