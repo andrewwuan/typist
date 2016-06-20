@@ -7,6 +7,9 @@ var password = "123";
 // Options
 var allowBackspace = true;
 var endless = false;
+var showElapsedTime = true;
+var showWords = true;
+var showAverageSpeed = true;
 
 // Variables
 var numCharsPerLine;
@@ -45,6 +48,7 @@ $(window).load(function() {
         $("#home-link").hide();
 
         resetTyperContainers();
+        updateStatsView();
 
         event.stopPropagation();
     });
@@ -104,6 +108,18 @@ $(window).load(function() {
 
     $("#backspace-checkbox").change(function(event) {
         allowBackspace = this.checked;
+    });
+
+    $("#show-elapsed-time-checkbox").change(function(event) {
+        showElapsedTime = this.checked;
+    });
+
+    $("#show-words-checkbox").change(function(event) {
+        showWords = this.checked;
+    });
+
+    $("#show-average-speed-checkbox").change(function(event) {
+        showAverageSpeed = this.checked;
     });
 
     $("#load-sample-text").click(function(event) {
@@ -195,9 +211,26 @@ function updateTyperContainersView() {
 }
 
 function updateStatsView() {
-    $("#elapsed-time-value-number").text(Math.floor(String(elapsedSec10 / 10)));
-    $("#word-count-value-number").text(String(words));
-    $("#average-speed-value-number").text(String(Math.ceil(words * 60 * 10 / elapsedSec10)));
+    if (showElapsedTime) {
+        $("#elapsed-time").show();
+        $("#elapsed-time-value-number").text(Math.floor(String(elapsedSec10 / 10)));
+    } else {
+        $("#elapsed-time").hide();
+    }
+
+    if (showWords) {
+        $("#word-count").show();
+        $("#word-count-value-number").text(String(words));
+    } else {
+        $("#word-count").hide();
+    }
+
+    if (showAverageSpeed) {
+        $("#average-speed").show();
+        $("#average-speed-value-number").text(String(Math.ceil(words * 60 * 10 / elapsedSec10)));
+    } else {
+        $("#average-speed").hide();
+    }
 }
 
 // Typing related
