@@ -227,7 +227,9 @@ function updateStatsView() {
 
     if (showAverageSpeed) {
         $("#average-speed").show();
-        $("#average-speed-value-number").text(String(Math.ceil(words * 60 * 10 / elapsedSec10)));
+        var speed = words * 60 * 10 / elapsedSec10;
+        speed = speed || 0;
+        $("#average-speed-value-number").text(String(Math.ceil(speed)));
     } else {
         $("#average-speed").hide();
     }
@@ -380,7 +382,9 @@ function finish() {
     row["finish time"] = timeStamp();
     row["duration"] = Math.floor(elapsedSec10 / 10);
     row["words"] = words;
-    row["wpm"] = Math.round(words * 10 * 60 / elapsedSec10);
+    var speed = words * 10 * 60 / elapsedSec10;
+    speed = speed || 0;
+    row["wpm"] = Math.round(speed);
     row["hits"] = hits;
     row["misses"] = misses;
     row["hit rate"] = ((hits / (hits + misses)) * 100).toFixed(2) + "%";
