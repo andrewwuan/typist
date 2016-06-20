@@ -26,7 +26,7 @@ var words = 0;
 var hits = 0;
 var misses = 0;
 
-var startPrompt = "Click this area to resume";
+var startPrompt = "Click this area to resume; click outside to stop";
 var pausePrompt = "Type now! Click again to pause";
 var beginPrompt = "Click this area to begin";
 var restartPrompt = "Click this area to restart";
@@ -38,16 +38,18 @@ $(window).load(function() {
 
     numCharsPerLine = Math.ceil($("#reference-container").width() / 9);
 
-    $("#typer-title,#home-link").click(function() {
+    $("#typer-title,#home-link").click(function(event) {
         $("#main-container").show();
         $("#admin-container").hide();
         $("#admin-link").show();
         $("#home-link").hide();
 
         resetTyperContainers();
+
+        event.stopPropagation();
     });
 
-    $("#admin-link").click(function() {
+    $("#admin-link").click(function(event) {
         if (elapsedSec10 == 0 || typeDone) {
             $("#password-input").val('');
             $("#password-container").show();
@@ -62,6 +64,8 @@ $(window).load(function() {
         } else {
             alert("Typing session in progress!")
         }
+
+        event.stopPropagation();
     });
 
     $("#password-input").keypress(function (e) {
@@ -76,35 +80,37 @@ $(window).load(function() {
         }
     });
 
-    $("#update-typing-text").click(function() {
+    $("#update-typing-text").click(function(event) {
         typeText = cleanText($("#typing-text").val());
         resetTyperContainers();
         alert("Update Successful!");
+
+        event.stopPropagation();
     });
 
-    $("#download-data").click(function() {
+    $("#download-data").click(function(event) {
         readFromFile(function (fe, content) {
             console.log(content);
             var downloadA = $("<a>", {download: "data.csv", href: "data:text/csv,"+encodeURIComponent(content)});
             downloadA[0].click();
         });
+
+        event.stopPropagation();
     });
 
     $("#endless-checkbox").change(function() {
         endless = this.checked;
     });
 
-    $("#backspace-checkbox").change(function() {
+    $("#backspace-checkbox").change(function(event) {
         allowBackspace = this.checked;
     });
 
-    $("#load-sample-text").click(function() {
+    $("#load-sample-text").click(function(event) {
         typeText = cleanText(sampleText);
         resetTyperContainers();
-    });
 
-    $("#reference-container").click(function() {
-
+        event.stopPropagation();
     });
 
     $("#input-container").click(function(event) {
@@ -120,6 +126,21 @@ $(window).load(function() {
 
         event.stopPropagation();
     });
+
+    $("body").click(function() {
+        if (elapsedSec10 != 0 && timerInterval == undefined && !typeDone) {
+            // Paused
+            var doStop = confirm("Do you really want to stop?");
+            if (doStop) {
+                typeDone = true;
+                finish();
+            }
+        }
+    });
+
+    if (window.requestFileSystem == undefined) {
+        alert("Saving & downloading data won't be available in non Google Chrome browser.");
+    }
 
     // Load sample text
     typeText = cleanText(sampleText);
