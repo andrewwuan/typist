@@ -1,6 +1,5 @@
 // Reading & Writing to client browser persistent storage using HTML5 FileSystem API
 
-var dataFileName = "data.csv";
 var storageChunk = 10 * 1024; // 10KB
 var storageDelta = 5 * 1024; // 5KB
 var currentQuota = storageChunk;
@@ -60,14 +59,14 @@ function appRequestFileSystem(callback) {
     });
 }
 
-function appGetFileEntry(callback) {
+function appGetFileEntry(callback, fileName) {
     appRequestFileSystem(function (fs) {
-        fs.root.getFile(dataFileName, {create: true, exclusive: false}, callback, fsErrorHandler);
+        fs.root.getFile(fileName, {create: true, exclusive: false}, callback, fsErrorHandler);
     });
 }
 
 // Read data from file on disk
-function readFromFile(callback) {
+function readFromFile(callback, fileName) {
     appGetFileEntry(function(fileEntry) {
         // Read from current file
         fileEntry.file(function(file) {
@@ -79,11 +78,11 @@ function readFromFile(callback) {
 
             reader.readAsText(file);
         }, fsErrorHandler);
-    });
+    }, fileName);
 }
 
 // Append data to file on disk
-function appendRowToFile(row) {
+function appendRowToFile(row, fileName) {
     readFromFile(function(fileEntry, csvContent) {
 
         // Generate new csv text
@@ -97,7 +96,7 @@ function appendRowToFile(row) {
 
         // Write
         writeToFile(fileEntry, text);
-    });
+    }, fileName);
 }
 
 // Write plain text to file on disk
@@ -111,6 +110,7 @@ function writeToFile(fileEntry, text) {
         if (text.length > currentQuota - storageDelta) {
             increaseCurrentQuota();
             appGetFileEntry(function (newFileEntry) {
+                console.log("Expanding storage");
                 writeToFile(newFileEntry, text);
             });
         }

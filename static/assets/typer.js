@@ -2,7 +2,9 @@
 // Configuration
 var numReferenceLinesToShow = 3;
 var numTypeLinesToShow = 2;
-var password = "123";
+var password = "132";
+var dataFileName = "data.csv";
+var textFileName = "text.txt";
 
 // Options
 var allowBackspace = true;
@@ -40,6 +42,8 @@ $(window).load(function() {
     console.log("Ready!");
 
     numCharsPerLine = Math.ceil($("#reference-container").width() / 9);
+
+    // Load config from cookies
     endless = (readCookie("endless") || endless.toString()) === "true";
     allowBackspace = (readCookie("allowBackspace") || allowBackspace.toString()) === "true";
     showWords = (readCookie("showWords") || showWords.toString()) === "true";
@@ -97,8 +101,13 @@ $(window).load(function() {
 
     $("#update-typing-text").click(function(event) {
         sampleText = $("#typing-text").val();
+
+        // Write text to FS
+        appGetFileEntry(function(fileEntry) {
+            writeToFile(fileEntry, sampleText);
+        }, textFileName);
+
         resetTyperContainers();
-        alert("Update Successful!");
 
         event.stopPropagation();
     });
@@ -108,7 +117,7 @@ $(window).load(function() {
             console.log(content);
             var downloadA = $("<a>", {download: "data.csv", href: "data:text/csv,"+encodeURIComponent(content)});
             downloadA[0].click();
-        });
+        }, dataFileName);
 
         event.stopPropagation();
     });
@@ -167,9 +176,12 @@ $(window).load(function() {
         alert("Saving & downloading data won't be available in non Google Chrome browser.");
     }
 
-    // Load sample text
-    resetTyperContainers();
-    updateStatsView();
+    // Load sample text from FS
+    readFromFile(function(fileEntry, text) {
+        sampleText = text || sampleText;
+        resetTyperContainers();
+        updateStatsView();
+    }, textFileName);
 });
 
 // Cookies
@@ -427,9 +439,9 @@ function finish() {
     row["misses"] = misses;
     row["hit rate"] = ((hits / (hits + misses)) * 100).toFixed(2) + "%";
 
-    appendRowToFile(row);
+    appendRowToFile(row, dataFileName);
 
-    readFromFile(function(fileEntry, text) {console.log(text);});
+    readFromFile(function(fileEntry, text) {console.log(text);}, dataFileName);
 }
 
 function fillReferenceLineIfNeeded() {
