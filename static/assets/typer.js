@@ -40,6 +40,17 @@ $(window).load(function() {
     console.log("Ready!");
 
     numCharsPerLine = Math.ceil($("#reference-container").width() / 9);
+    endless = (readCookie("endless") || endless.toString()) === "true";
+    allowBackspace = (readCookie("allowBackspace") || allowBackspace.toString()) === "true";
+    showWords = (readCookie("showWords") || showWords.toString()) === "true";
+    showElapsedTime = (readCookie("showElapsedTime") || showElapsedTime.toString()) === "true";
+    showAverageSpeed = (readCookie("showAverageSpeed") || showAverageSpeed.toString())=== "true";
+
+    $("#endless-checkbox").prop('checked', endless);
+    $("#backspace-checkbox").prop('checked', allowBackspace);
+    $("#show-words-checkbox").prop('checked', showWords);
+    $("#show-elapsed-time-checkbox").prop('checked', showElapsedTime);
+    $("#show-average-speed-checkbox").prop('checked', showAverageSpeed);
 
     $("#typer-title,#home-link").click(function(event) {
         $("#main-container").show();
@@ -76,7 +87,7 @@ $(window).load(function() {
         if (e.which == 13) {
             if ($("#password-input").val() == password) {
                 $("#password-container").hide();
-                $("#typing-text").val(typeText);
+                $("#typing-text").val(sampleText);
                 $("#options").show();
             } else {
                 alert($("#password-input").val() + " is not the correct password!");
@@ -85,7 +96,7 @@ $(window).load(function() {
     });
 
     $("#update-typing-text").click(function(event) {
-        typeText = cleanText($("#typing-text").val());
+        sampleText = $("#typing-text").val();
         resetTyperContainers();
         alert("Update Successful!");
 
@@ -103,30 +114,28 @@ $(window).load(function() {
     });
 
     $("#endless-checkbox").change(function() {
+        createCookie("endless", this.checked, 10);
         endless = this.checked;
     });
 
     $("#backspace-checkbox").change(function(event) {
+        createCookie("allowBackspace", this.checked, 10);
         allowBackspace = this.checked;
     });
 
     $("#show-elapsed-time-checkbox").change(function(event) {
+        createCookie("showElapsedTime", this.checked, 10);
         showElapsedTime = this.checked;
     });
 
     $("#show-words-checkbox").change(function(event) {
+        createCookie("showWords", this.checked, 10);
         showWords = this.checked;
     });
 
     $("#show-average-speed-checkbox").change(function(event) {
+        createCookie("showAverageSpeed", this.checked, 10);
         showAverageSpeed = this.checked;
-    });
-
-    $("#load-sample-text").click(function(event) {
-        typeText = cleanText(sampleText);
-        resetTyperContainers();
-
-        event.stopPropagation();
     });
 
     $("#input-container").click(function(event) {
@@ -159,9 +168,37 @@ $(window).load(function() {
     }
 
     // Load sample text
-    typeText = cleanText(sampleText);
     resetTyperContainers();
+    updateStatsView();
 });
+
+// Cookies
+// Reference: http://stackoverflow.com/questions/1599287/create-read-and-erase-cookies-with-jquery
+function createCookie(name, value, days) {
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        var expires = "; expires=" + date.toGMTString();
+    }
+    else var expires = "";
+
+    document.cookie = name + "=" + value + expires + "; path=/";
+}
+
+function readCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+}
+
+function eraseCookie(name) {
+    createCookie(name, "", -1);
+}
 
 function cleanText(text) {
     return text.replace(/( |\r|\r\n|\n)/g, String.fromCharCode(160))
@@ -169,6 +206,7 @@ function cleanText(text) {
 
 // Typing text related
 function resetTyperContainers() {
+    typeText = cleanText(sampleText);
     textDepleted = false;
     currentIndex = 0;
     words = 0;
@@ -461,7 +499,6 @@ function getNextLine() {
     if (endless) {
         while (currentIndex + numCharsPerLine >= typeText.length - 1) {
             typeText = typeText + String.fromCharCode(160) + typeText;
-            console.log("Expanded. typeText = " + typeText);
         }
     }
 
