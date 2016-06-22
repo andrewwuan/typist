@@ -12,6 +12,7 @@ var endless = false;
 var showElapsedTime = true;
 var showWords = true;
 var showAverageSpeed = true;
+var timeLimit = 0;
 
 // Variables
 var numCharsPerLine;
@@ -49,6 +50,7 @@ $(window).load(function() {
     showWords = (readCookie("showWords") || showWords.toString()) === "true";
     showElapsedTime = (readCookie("showElapsedTime") || showElapsedTime.toString()) === "true";
     showAverageSpeed = (readCookie("showAverageSpeed") || showAverageSpeed.toString())=== "true";
+    timeLimit = parseInt(readCookie("timeLimit") || "0");
 
     $("#endless-checkbox").prop('checked', endless);
     $("#backspace-checkbox").prop('checked', allowBackspace);
@@ -92,6 +94,7 @@ $(window).load(function() {
             if ($("#password-input").val() == password) {
                 $("#password-container").hide();
                 $("#typing-text").val(sampleText);
+                $("#time-limit-input").val(timeLimit);
                 $("#options").show();
             } else {
                 alert($("#password-input").val() + " is not the correct password!");
@@ -132,29 +135,34 @@ $(window).load(function() {
         }
     });
 
+    $("#time-limit-input").on("change paste keyup", function () {
+        timeLimit = parseInt($(this).val());
+        createCookie("timeLimit", $(this).val(), 10);
+    });
+
     $("#endless-checkbox").change(function() {
-        createCookie("endless", this.checked, 10);
         endless = this.checked;
+        createCookie("endless", this.checked, 10);
     });
 
     $("#backspace-checkbox").change(function(event) {
-        createCookie("allowBackspace", this.checked, 10);
         allowBackspace = this.checked;
+        createCookie("allowBackspace", this.checked, 10);
     });
 
     $("#show-elapsed-time-checkbox").change(function(event) {
-        createCookie("showElapsedTime", this.checked, 10);
         showElapsedTime = this.checked;
+        createCookie("showElapsedTime", this.checked, 10);
     });
 
     $("#show-words-checkbox").change(function(event) {
-        createCookie("showWords", this.checked, 10);
         showWords = this.checked;
+        createCookie("showWords", this.checked, 10);
     });
 
     $("#show-average-speed-checkbox").change(function(event) {
-        createCookie("showAverageSpeed", this.checked, 10);
         showAverageSpeed = this.checked;
+        createCookie("showAverageSpeed", this.checked, 10);
     });
 
     $("#input-container").click(function(event) {
@@ -272,7 +280,13 @@ function updateTyperContainersView() {
 function updateStatsView() {
     if (showElapsedTime) {
         $("#elapsed-time").show();
-        $("#elapsed-time-value-number").text(Math.floor(String(elapsedSec10 / 10)));
+        if (timeLimit != 0) {
+            $("#elapsed-time-key").text("Remaining Time: ");
+            $("#elapsed-time-value-number").text(Math.floor(timeLimit - elapsedSec10 / 10));
+        } else {
+            $("#elapsed-time-key").text("Elapsed Time: ");
+            $("#elapsed-time-value-number").text(Math.floor(String(elapsedSec10 / 10)));
+        }
     } else {
         $("#elapsed-time").hide();
     }
@@ -308,6 +322,11 @@ function startTyping() {
             elapsedSec10++;
             if (elapsedSec10 % 10 == 0) {
                 updateStatsView();
+                if (timeLimit != 0 && Math.floor(timeLimit - elapsedSec10 / 10) <= 0) {
+                    // Countdown mode finish
+                    typeDone = true;
+                    finish();
+                }
             }
         }, 100);
     }

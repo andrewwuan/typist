@@ -103,7 +103,7 @@ html, body {
 }
 
 #options {
-    margin: 150px auto 10px auto;
+    margin: 80px auto 10px auto;
     text-align: center;
     font-weight: bold;
 }
@@ -124,6 +124,16 @@ html, body {
     padding: 12px 20px;
     margin: 8px 0;
     box-sizing: border-box;
+    text-align: center;
+    font-size: 16px;
+}
+
+#time-limit-input {
+    width: 15%;
+    padding: 8px 10px;
+    margin: 45px auto;
+    border: 2px solid #cccccc;
+    border-radius: 5px;
     text-align: center;
     font-size: 16px;
 }

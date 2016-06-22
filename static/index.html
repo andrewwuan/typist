@@ -17,15 +17,15 @@
         <!-- Type speed -->
         <div id="stats">
             <span id="elapsed-time" class="field">
-                <span id="elapsed-time" class="field-key">Elapsed Time: </span>
+                <span id="elapsed-time-key" class="field-key">Elapsed Time: </span>
                 <span id="elapsed-time-value-number" class="field-value">0</span><span id="average-speed-value-unit"> sec</span>
             </span>
             <span id="word-count" class="field">
-                <span id="word-count" class="field-key">Words: </span>
+                <span id="word-count-key" class="field-key">Words: </span>
                 <span id="word-count-value-number" class="field-value">0</span>
             </span>
             <span id="average-speed" class="field">
-                <span id="average-speed" class="field-key">Average Speed: </span>
+                <span id="average-speed-key" class="field-key">Average Speed: </span>
                 <span id="average-speed-value-number" class="field-value">0</span><span id="average-speed-value-unit"> WPM</span>
             </span>
         </div>
@@ -50,13 +50,18 @@
             <input id="password-input" type="password"/>
         </div>
         <div id="options" hidden>
+            <span id="time-limit" class="field">
+                <span id="time-limit-key">Time Limit (in seconds): </span>
+                <input type="number" id="time-limit-input" value="0">
+            </span>
+            <br />
             <span id="endless" class="field">
                 <input type="checkbox" name="endless" id="endless-checkbox"> Endless</input>
             </span>
             <span id="backspace" class="field">
                 <input type="checkbox" name="backspace" id="backspace-checkbox" checked> Backspace</input>
             <span id="show-elapsed-time" class="field">
-                <input type="checkbox" name="show-elapsed-time" id="show-elapsed-time-checkbox" checked> Show Elapsed Time</input>
+                <input type="checkbox" name="show-elapsed-time" id="show-elapsed-time-checkbox" checked> Show Elapsed/Remaining Time</input>
             <span id="show-words" class="field">
                 <input type="checkbox" name="show-words" id="show-words-checkbox" checked> Show Words</input>
             <span id="show-average-speed" class="field">
