@@ -122,6 +122,16 @@ $(window).load(function() {
         event.stopPropagation();
     });
 
+    $("#clear-data").click(function() {
+        if (confirm("Do you really want to clear?")) {
+            appGetFileEntry(function(fileEntry) {
+                removeFile(fileEntry, function() {
+                    alert("History data is removed!");
+                });
+            }, dataFileName);
+        }
+    });
+
     $("#endless-checkbox").change(function() {
         createCookie("endless", this.checked, 10);
         endless = this.checked;
@@ -164,8 +174,7 @@ $(window).load(function() {
     $("body").click(function() {
         if (elapsedSec10 != 0 && timerInterval == undefined && !typeDone) {
             // Paused
-            var doStop = confirm("Do you really want to stop?");
-            if (doStop) {
+            if (confirm("Do you really want to stop?")) {
                 typeDone = true;
                 finish();
             }

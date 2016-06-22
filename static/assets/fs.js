@@ -120,3 +120,8 @@ function writeToFile(fileEntry, text) {
 
     }, fsErrorHandler);
 }
+
+// Remove file from disk
+function removeFile(fileEntry, callback) {
+    fileEntry.remove(callback);
+}
