@@ -7,6 +7,7 @@ var dataFileName = "data.csv";
 var textFileName = "text.txt";
 
 // Options
+var showErrors = true;
 var allowBackspace = true;
 var endless = false;
 var showElapsedTime = true;
@@ -45,6 +46,7 @@ $(window).load(function() {
     numCharsPerLine = Math.ceil($("#reference-container").width() / 9);
 
     // Load config from cookies
+    showErrors = (readCookie("showErrors") || showErrors.toString()) === "true";
     endless = (readCookie("endless") || endless.toString()) === "true";
     allowBackspace = (readCookie("allowBackspace") || allowBackspace.toString()) === "true";
     showWords = (readCookie("showWords") || showWords.toString()) === "true";
@@ -52,6 +54,7 @@ $(window).load(function() {
     showAverageSpeed = (readCookie("showAverageSpeed") || showAverageSpeed.toString())=== "true";
     timeLimit = parseInt(readCookie("timeLimit") || "0");
 
+    $("#show-errors-checkbox").prop('checked', showErrors);
     $("#endless-checkbox").prop('checked', endless);
     $("#backspace-checkbox").prop('checked', allowBackspace);
     $("#show-words-checkbox").prop('checked', showWords);
@@ -138,6 +141,11 @@ $(window).load(function() {
     $("#time-limit-input").on("change paste keyup", function () {
         timeLimit = parseInt($(this).val());
         createCookie("timeLimit", $(this).val(), 10);
+    });
+
+    $("#show-errors-checkbox").change(function() {
+        showErrors = this.checked;
+        createCookie("showErrors", this.checked, 10);
     });
 
     $("#endless-checkbox").change(function() {
@@ -343,7 +351,7 @@ function getWords() {
         for (var j = 0; j < chars.length; j++) {
             var jqChar = $(chars[j]);
             var jqReferenceChar = $(referenceChars[j]);
-            if (jqChar.hasClass("char-incorrect")) {
+            if (jqChar.hasClass("char-incorrect") || jqChar.hasClass("char-incorrect-override")) {
                 seenError = true;
             }
 
@@ -447,7 +455,11 @@ function keyPressHandler(event) {
         char.addClass("char-correct");
     } else {
         misses++;
-        char.addClass("char-incorrect");
+        if (showErrors) {
+            char.addClass("char-incorrect");
+        } else {
+            char.addClass("char-incorrect-override")
+        }
     }
     line.append(char);
 }
