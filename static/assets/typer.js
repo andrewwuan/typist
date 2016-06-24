@@ -33,7 +33,7 @@ var words = 0;
 var hits = 0;
 var misses = 0;
 
-var startPrompt = "Click this area to resume; click outside to stop";
+var startPrompt = "Click this area to resume; click outside to end data collection";
 var pausePrompt = "Type now! Click again to pause";
 var beginPrompt = "Click this area to begin";
 var restartPrompt = "Click this area to restart";
